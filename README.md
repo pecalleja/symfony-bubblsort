@@ -23,5 +23,5 @@ PHP 5.6 and Composer
 
 5. Go to local http://localhost:8000/ and enjoy :)
 
-<img align="right" height="260" src="Screenshot.png">
+<img src="Screenshot.png">
 

@@ -16,11 +16,58 @@
 
         </div>
     </div>
-    <ul>
-        <li>
-            <a href="#">Item</a>
-        </li>
-    </ul>
+    <div class="row">
+        <div class="col-md-1">
+            {{ form_start(shuffleForm) }}
+            <input type="submit" value="Shuffle">
+            {{ form_end(shuffleForm) }}
+        </div>
+        <div class="col-md-1">
+            {{ form_start(stepFrom) }}
+            <input class="btn {% if fin %}disabled{% endif %}" type="submit" value="Step" >
+            {{ form_end(stepFrom) }}
+        </div>
+        <div class="col-md-1">
+
+            <input type="submit" value="Play">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Unsorted</h1>
+            <table class="table">
+                {% for item in unsorted|reverse %}
+                    <tr>
+                        <td style="border: 2px solid black;"
+                            colspan="{{ item }}"
+                        >{{ item }}</td>
+                        <td style="border: none"></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h1>Processing</h1>
+            <table class="table">
+                {% for item in processing|reverse %}
+                    <tr>
+                        <td
+                                style="border: 2px solid black;"
+                                colspan="{{ item }}"
+                                {% if 9 - j == loop.index0 %}class="bg-danger"{% endif %}
+                                {% if 9- j-1 == loop.index0 %}class="bg-success"{% endif %}
+                        >{{ item }}</td>
+                            <td style="border: none"></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+
+
+
 
     <!-- Modal -->
     <div id="deleteModal" class="modal fade" role="dialog">

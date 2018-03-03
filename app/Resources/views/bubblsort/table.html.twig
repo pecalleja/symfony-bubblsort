@@ -1,0 +1,13 @@
+<table class="table">
+    {% for item in processing|reverse %}
+        <tr>
+            <td
+                    style="border: 2px solid black;"
+                    colspan="{{ item }}"
+                    {% if 9 - j == loop.index0 %}class="bg-danger"{% endif %}
+                    {% if 9- j-1 == loop.index0 %}class="bg-success"{% endif %}
+            >{{ item }}</td>
+            <td style="border: none"></td>
+        </tr>
+    {% endfor %}
+</table>

@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
@@ -46,6 +47,33 @@ class DefaultController extends Controller
     }
 
     /**
+     *  Play Step process by ajax
+     * @Route("/play_step", name="play_step")
+     */
+    public function playStepAjaxAction(Request $request)
+    {
+        //This is optional. Do not do this check if you want to call the same action using a regular request.
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(array(
+                'status' => 'danger',
+                'fin' => 'true',
+                'message' => 'You can access this only using Ajax!'), 400);
+        }
+
+        $session = $this->get('session');
+
+        return new JsonResponse(array(
+            'status' => 'success',
+            'message' => 'ok',
+            'fin' => $this->stepProcess(),
+            'table' => $this->renderView(':bubblsort:table.html.twig', array(
+                'processing' => $session->get('processing'),
+                'j' => $session->get('j'),
+            ))
+        ), 200);
+    }
+
+    /**
      * Step process.
      *
      * @Route("/step", name="step")
@@ -55,33 +83,42 @@ class DefaultController extends Controller
     {
         $form = $this->createStepForm();
         $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->stepProcess();
+        }
+
+        return $this->redirectToRoute('homepage');
+    }
+
+    private function stepProcess()
+    {
         $session = $this->get('session');
         $processing = $session->get('processing');
         $i = $session->get('i');
         $j = $session->get('j');
-        if ($form->isSubmitted() && $form->isValid()) {
-            if($i < 9){
-                if($j<9-$i){
-                    if($processing[$j] > $processing[$j+1]){
-                        $temp = $processing[$j];
-                        $processing[$j] = $processing[$j+1];
-                        $processing[$j+1] = $temp;
-                    }
-                    $j++;
-                }else{
-                    $i++;
-                    $j=0;
-                }
-            }else{
-                $session->set('fin', true);
-            }
 
-            $session->set('processing', $processing);
-            $session->set('i', $i);
-            $session->set('j', $j);
+        if($i < 9){
+            if($j<9-$i){
+                if($processing[$j] > $processing[$j+1]){
+                    $temp = $processing[$j];
+                    $processing[$j] = $processing[$j+1];
+                    $processing[$j+1] = $temp;
+                }
+                $j++;
+            }else{
+                $i++;
+                $j=0;
+            }
+        }else{
+            $session->set('fin', true);
         }
 
-        return $this->redirectToRoute('homepage');
+        $session->set('processing', $processing);
+        $session->set('i', $i);
+        $session->set('j', $j);
+
+        return $session->get('fin')?'true':'false';
     }
 
     /**
